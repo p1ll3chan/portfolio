@@ -326,5 +326,62 @@
     </footer>
 
     <script src="app.js"></script>
+    <!-- 1) Include EmailJS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+  emailjs.init({ publicKey: "2C6ViNRxTrcSLbOK2" }); // from EmailJS dashboard
+</script>
+
+<script>
+function handleContactForm() {
+  const contactForm = document.querySelector('.contact-form');
+  if (!contactForm) return;
+
+  contactForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // Basic validation (keep existing)
+    const fd = new FormData(contactForm);
+    const name = fd.get('name')?.toString().trim() || '';
+    const email = fd.get('email')?.toString().trim() || '';
+    const subject = fd.get('subject')?.toString().trim() || '';
+    const message = fd.get('message')?.toString().trim() || '';
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!name || !email || !subject || !message) {
+      showNotification('Please fill in all fields', 'error');
+      return;
+    }
+    if (!emailRegex.test(email)) {
+      showNotification('Please enter a valid email address', 'error');
+      return;
+    }
+
+    // 2) Send via EmailJS
+    const submitBtn = contactForm.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Sending Message...';
+    submitBtn.disabled = true;
+    submitBtn.style.opacity = '0.7';
+
+    try {
+      // Replace with your EmailJS IDs
+      const SERVICE_ID = 'service_85y61ym';
+      const TEMPLATE_ID = 'template_gcvd79r';
+      await emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, contactForm);
+      showNotification('🚀 Message sent successfully! Will respond soon. 🚀', 'success');
+      contactForm.reset();
+    } catch (err) {
+      showNotification('Sending failed. Try again later.', 'error');
+      console.error(err);
+    } finally {
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+      submitBtn.style.opacity = '1';
+    }
+  });
+}
+</script>
+
 </body>
 </html>
